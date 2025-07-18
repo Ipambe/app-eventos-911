@@ -1,29 +1,31 @@
-import { DarkTheme, DefaultTheme, ThemeProvider } from '@react-navigation/native';
-import { useFonts } from 'expo-font';
-import { Stack } from 'expo-router';
-import { StatusBar } from 'expo-status-bar';
-import 'react-native-reanimated';
+// Nombre: Rafael Adolfo Rosa
+// Matricula: 2023-1025
 
-import { useColorScheme } from '@/hooks/useColorScheme';
-
+import { db } from '@/db/db'
+import migrations from '@/drizzle/migrations'
+import { useMigrations } from 'drizzle-orm/expo-sqlite/migrator'
+import { Stack } from 'expo-router'
+import { ActivityIndicator } from 'react-native'
+import '../global.css'
 export default function RootLayout() {
-  const colorScheme = useColorScheme();
-  const [loaded] = useFonts({
-    SpaceMono: require('../assets/fonts/SpaceMono-Regular.ttf'),
-  });
+  const { success } = useMigrations(db, migrations)
 
-  if (!loaded) {
-    // Async font loading only occurs in development.
-    return null;
-  }
+  if (!success) return <ActivityIndicator size='large' />
 
   return (
-    <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
-      <Stack>
-        <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-        <Stack.Screen name="+not-found" />
-      </Stack>
-      <StatusBar style="auto" />
-    </ThemeProvider>
-  );
+    <Stack initialRouteName='index'>
+      <Stack.Screen
+        name='index'
+        options={{ title: 'Listado de eventos' }}
+      />
+      <Stack.Screen
+        name='createEvento'
+        options={{ title: 'Creando un nuevo evento' }}
+      />
+      <Stack.Screen
+        name='evento'
+        options={{ title: 'Evento' }}
+      />
+    </Stack>
+  )
 }
